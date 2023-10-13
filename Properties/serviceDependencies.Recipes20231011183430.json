@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "apis1": {
+      "apiEndpoint": "https://pozoroutesapi.azure-api.net/",
       "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.ApiManagement/service/PozoRoutesAPI/apis/Routes",
       "type": "apis.azure"
     }

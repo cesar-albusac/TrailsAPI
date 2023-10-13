@@ -9,7 +9,7 @@ using static System.Net.WebRequestMethods;
 
 namespace Routes.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("/")]
     [ApiController]
     public class RoutesController : ControllerBase
     {

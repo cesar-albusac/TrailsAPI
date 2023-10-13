@@ -9,13 +9,13 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
-
+app.UseSwagger();
 // Configure the HTTP request pipeline.
-//if (app.Environment.IsDevelopment())
-//{
-    app.UseSwagger();
+if (app.Environment.IsDevelopment())
+{
+
     app.UseSwaggerUI();
-//}
+}
 
 app.UseHttpsRedirection();
 
