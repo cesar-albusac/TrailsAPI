@@ -8,6 +8,9 @@
       "type": "cosmosdb",
       "connectionId": "ConnectionStrings",
       "dynamicId": null
+    },
+    "apis1": {
+      "type": "apis"
     }
   }
 }

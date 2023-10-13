@@ -9,8 +9,8 @@ using static System.Net.WebRequestMethods;
 
 namespace Routes.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("/")]
     public class RoutesController : ControllerBase
     {
         // The name of the database and container we will create
