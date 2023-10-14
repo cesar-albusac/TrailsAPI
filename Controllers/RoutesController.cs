@@ -154,22 +154,6 @@ namespace Routes.Controllers
         #endregion
 
         #region POST
-        // create new routes
-        [HttpPost]
-        public async Task<ActionResult> CreateNewRoutes([FromBody] List<HikingRoute> routes)
-        {
-            if (routes == null)
-            {
-                return BadRequest();
-            }
-
-            foreach (HikingRoute route in routes)
-            {
-                ItemResponse<HikingRoute> response = await this.ContainerClient().CreateItemAsync<HikingRoute>(route, new PartitionKey(route.Id));
-            }
-
-            return Ok();
-        }
 
         // Create a new route
         [HttpPost]
