@@ -14,6 +14,8 @@ namespace Routes.Controllers
     [ApiController]
     public class RoutesController : ControllerBase
     {
+
+
         // The name of the database and container we will create
         string databaseId = "HikingRoutes";
         string containerId = "Routes";
@@ -83,10 +85,47 @@ namespace Routes.Controllers
         }
 
         #region GET
+        // Get all routes
+        [HttpGet]
+        public async Task<ActionResult> GetRoutes([FromQuery] int count)
+        {
+            var totalCount = "SELECT VALUE COUNT(1) FROM c";
+            QueryDefinition totalCountQueryDefinition = new QueryDefinition(totalCount);
+            var resultSetIterator = this.ContainerClient().GetItemQueryIterator<int>(totalCountQueryDefinition);
+
+            var sqlQueryText = "SELECT * FROM routes";
+            if (count != 0)
+            {
+                sqlQueryText += string.Format("OFFSET 0 LIMIT {0}", count);
+            }
+
+            Console.WriteLine("Running query: {0}\n", sqlQueryText);
+
+            QueryDefinition queryDefinition = new QueryDefinition(sqlQueryText);
+
+            FeedIterator<HikingRoute> queryResultSetIterator = this.ContainerClient().GetItemQueryIterator<HikingRoute>(queryDefinition);
+
+            List<HikingRoute> routes = new List<HikingRoute>();
+
+            while (queryResultSetIterator.HasMoreResults)
+            {
+                FeedResponse<HikingRoute> currentResultSet = await queryResultSetIterator.ReadNextAsync();
+                foreach (HikingRoute route in currentResultSet)
+                {
+                    routes.Add(route);
+                }
+            }
+
+            return Ok(routes);
+        }
+
         // Get route by id
         [HttpGet("{id}")]
-        public async Task<ActionResult> GetRouteById(string id)
+        public async Task<ActionResult> GetRouteById(int id)
         {
+            if (id < 1)
+                return BadRequest();
+
             var sqlQueryText = "SELECT * FROM routes r WHERE r.id = @id";
             QueryDefinition queryDefinition = new QueryDefinition(sqlQueryText).WithParameter("@id", id);
             FeedIterator<HikingRoute> queryResultSetIterator = this.ContainerClient().GetItemQueryIterator<HikingRoute>(queryDefinition);
@@ -102,42 +141,15 @@ namespace Routes.Controllers
                 }
             }
 
-            return Ok(routes);
-        }   
-
-
-        [HttpGet]
-        public async Task<ActionResult> GetRoutes([FromQuery]int count)
-        {
-            var totalCount = "SELECT VALUE COUNT(1) FROM c";
-            QueryDefinition totalCountQueryDefinition = new QueryDefinition(totalCount);
-            var resultSetIterator = this.ContainerClient().GetItemQueryIterator<int>(totalCountQueryDefinition);
-
-            var sqlQueryText = "SELECT * FROM routes";
-            if(count != 0)
+            if(routes.Count == 0)
             {
-                sqlQueryText += string.Format("OFFSET 0 LIMIT {0}", count);
+                return NotFound();
             }
 
-            Console.WriteLine("Running query: {0}\n", sqlQueryText);
-
-            QueryDefinition queryDefinition = new QueryDefinition(sqlQueryText);
-            
-            FeedIterator<HikingRoute> queryResultSetIterator = this.ContainerClient().GetItemQueryIterator<HikingRoute>(queryDefinition);
-
-            List<HikingRoute> routes = new List<HikingRoute>();
-
-            while (queryResultSetIterator.HasMoreResults)
-            {
-                FeedResponse<HikingRoute> currentResultSet = await queryResultSetIterator.ReadNextAsync();
-                foreach (HikingRoute route in currentResultSet)
-                {
-                    routes.Add(route);
-                }
-            }
-            
             return Ok(routes);
         }
+
+        
 
         #endregion
 
@@ -163,6 +175,11 @@ namespace Routes.Controllers
         [HttpPut("{id}")]
         public async Task<ActionResult> UpdateRoute(string id, [FromBody] HikingRoute route)
         {
+            if(route == null || route.Id == null)
+            {
+                return BadRequest();
+            }
+
             ItemResponse<HikingRoute> response = await this.ContainerClient().ReadItemAsync<HikingRoute>(id, new PartitionKey(id));
             if (response != null)
             {
@@ -181,6 +198,10 @@ namespace Routes.Controllers
                 response = await this.ContainerClient().ReplaceItemAsync<HikingRoute>(response.Resource, response.Resource.Id, new PartitionKey(response.Resource.Id));
                 return Ok(response.Resource);
             }
+            else
+            {
+                NotFound();
+            }
 
             return BadRequest();
         }
@@ -190,9 +211,14 @@ namespace Routes.Controllers
         #region Delete
         // Delete a route 
         [HttpDelete("{id}")]
-        public async Task<ActionResult> DeleteRoute(string id)
+        public async Task<ActionResult> DeleteRoute(int id)
         {
-            ItemResponse<HikingRoute> response = await this.ContainerClient().DeleteItemAsync<HikingRoute>(id, new PartitionKey(id));
+            if (id <= 0 )
+            {
+                return BadRequest();
+            }
+
+            ItemResponse<HikingRoute> response = await this.ContainerClient().DeleteItemAsync<HikingRoute>(id.ToString(), new PartitionKey(id));
             return NoContent();
         }
 

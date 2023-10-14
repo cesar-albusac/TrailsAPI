@@ -39,7 +39,7 @@
         public HikingRoute() { }
 
         // Constructor
-        public HikingRoute(string name, double distance, TimeSpan duration, List<string> waypoints, DifficultyLevel difficulty)
+        public HikingRoute(string name, double distance, TimeSpan duration, List<Waypoint> waypoints, DifficultyLevel difficulty)
         {
             Name = name;
             DistanceInKilometers = distance;
