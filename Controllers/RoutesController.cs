@@ -149,11 +149,28 @@ namespace Routes.Controllers
             return Ok(routes);
         }
 
-        
+
 
         #endregion
 
         #region POST
+        // create new routes
+        [HttpPost]
+        public async Task<ActionResult> CreateNewRoutes([FromBody] List<HikingRoute> routes)
+        {
+            if (routes == null)
+            {
+                return BadRequest();
+            }
+
+            foreach (HikingRoute route in routes)
+            {
+                ItemResponse<HikingRoute> response = await this.ContainerClient().CreateItemAsync<HikingRoute>(route, new PartitionKey(route.Id));
+            }
+
+            return Ok();
+        }
+
         // Create a new route
         [HttpPost]
         public async Task<ActionResult> CreateNewRoute([FromBody] HikingRoute newRoute)
@@ -170,6 +187,41 @@ namespace Routes.Controllers
         #endregion
 
         #region PUT
+        // update all routes
+        [HttpPut]
+        public async Task<ActionResult> UpdateAllRoutes([FromBody] List<HikingRoute> routes)
+        {
+            if (routes == null)
+            {
+                return BadRequest();
+            }
+
+            foreach (HikingRoute route in routes)
+            {
+                ItemResponse<HikingRoute> response = await this.ContainerClient().ReadItemAsync<HikingRoute>(route.Id, new PartitionKey(route.Id));
+                if (response != null)
+                {
+                    response.Resource.Name = route.Name;
+                    response.Resource.Difficulty = route.Difficulty;
+                    response.Resource.EstimatedDuration = route.EstimatedDuration;
+                    response.Resource.DistanceInKilometers = route.DistanceInKilometers;
+                    response.Resource.StartingPoint = route.StartingPoint;
+                    response.Resource.EndingPoint = route.EndingPoint;
+                    response.Resource.Description = route.Description;
+                    response.Resource.ImageUrl = route.ImageUrl;
+                    response.Resource.GpxFileUrl = route.GpxFileUrl;
+                    response.Resource.Tags = route.Tags;
+
+                    response = await this.ContainerClient().ReplaceItemAsync<HikingRoute>(response.Resource, response.Resource.Id, new PartitionKey(response.Resource.Id));
+                }
+                else
+                {
+                    NotFound();
+                }
+            }
+
+            return Ok();
+        }
 
         // Update a route
         [HttpPut("{id}")]
@@ -223,9 +275,8 @@ namespace Routes.Controllers
         }
 
         // Delete all routes
-        [HttpPost]
-        [Route("delete")]
-        public async Task<ActionResult> DeleteRoutes()
+        [HttpDelete]
+        public async Task<ActionResult> DeleteAllRoutes()
         {
             var sqlQueryText = "SELECT * FROM routes";
             QueryDefinition queryDefinition = new QueryDefinition(sqlQueryText);
@@ -242,13 +293,13 @@ namespace Routes.Controllers
                 }
             }
 
-            foreach (HikingRoute route in routes)
+            foreach(HikingRoute route in routes)
             {
                 await this.ContainerClient().DeleteItemAsync<HikingRoute>(route.Id, new PartitionKey(route.Id));
             }
 
             return NoContent();
-        }
+        }   
 
         #endregion  
     }
