@@ -12,7 +12,7 @@
         public string Id { get; set; }
         public string Name { get; set; }
         public double DistanceInKilometers { get; set; }
-        public TimeSpan EstimatedDuration { get; set; }
+        public double EstimatedDuration { get; set; }
         public List<Waypoint> Waypoints { get; set; }
         public DifficultyLevel Difficulty { get; set; }
         public string StartingPoint { get; set; }
@@ -39,7 +39,7 @@
         public HikingRoute() { }
 
         // Constructor
-        public HikingRoute(string name, double distance, TimeSpan duration, List<Waypoint> waypoints, DifficultyLevel difficulty)
+        public HikingRoute(string name, double distance, double duration, List<Waypoint> waypoints, DifficultyLevel difficulty)
         {
             Name = name;
             DistanceInKilometers = distance;
