@@ -15,6 +15,14 @@
         public TimeSpan EstimatedDuration { get; set; }
         public List<string> Waypoints { get; set; }
         public DifficultyLevel Difficulty { get; set; }
+        public string StartingPoint { get; set; }
+        public string EndingPoint { get; set; }
+        public string Description { get; set; }
+        public string ImageUrl { get; set;}
+        public string GpxFileUrl { get; set;}
+        public string[] Tags { get; set;}
+
+
 
         // Enum for Difficulty Level
         public enum DifficultyLevel

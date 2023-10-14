@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Cosmos;
 using Routes.Models;
+using System.Collections.Generic;
 using System.Net;
 using static System.Net.WebRequestMethods;
 
@@ -80,12 +81,43 @@ namespace Routes.Controllers
             Container containerClient = cosmosDbClient.GetContainer(databaseId, containerId);
             return containerClient;
         }
-      
+
+        #region GET
+        // Get route by id
+        [HttpGet("{id}")]
+        public async Task<ActionResult> GetRouteById(string id)
+        {
+            var sqlQueryText = "SELECT * FROM routes r WHERE r.id = @id";
+            QueryDefinition queryDefinition = new QueryDefinition(sqlQueryText).WithParameter("@id", id);
+            FeedIterator<HikingRoute> queryResultSetIterator = this.ContainerClient().GetItemQueryIterator<HikingRoute>(queryDefinition);
+
+            List<HikingRoute> routes = new List<HikingRoute>();
+
+            while (queryResultSetIterator.HasMoreResults)
+            {
+                FeedResponse<HikingRoute> currentResultSet = await queryResultSetIterator.ReadNextAsync();
+                foreach (HikingRoute route in currentResultSet)
+                {
+                    routes.Add(route);
+                }
+            }
+
+            return Ok(routes);
+        }   
+
 
         [HttpGet]
         public async Task<ActionResult> GetRoutes([FromQuery]int count)
         {
+            var totalCount = "SELECT VALUE COUNT(1) FROM c";
+            QueryDefinition totalCountQueryDefinition = new QueryDefinition(totalCount);
+            var resultSetIterator = this.ContainerClient().GetItemQueryIterator<int>(totalCountQueryDefinition);
+
             var sqlQueryText = "SELECT * FROM routes";
+            if(count != 0)
+            {
+                sqlQueryText += string.Format("OFFSET 0 LIMIT {0}", count);
+            }
 
             Console.WriteLine("Running query: {0}\n", sqlQueryText);
 
@@ -107,40 +139,91 @@ namespace Routes.Controllers
             return Ok(routes);
         }
 
-        [HttpPut]
-        public ActionResult UpdateRoute(string nombre)
+        #endregion
+
+        #region POST
+        // Create a new route
+        [HttpPost]
+        public async Task<ActionResult> CreateNewRoute([FromBody] HikingRoute newRoute)
         {
-            if(nombre != null)
+            if (newRoute != null)
             {
-                string[] Routes = { "Pollo", "Paella" };
-                if (Routes.Contains(nombre))
-                    return Ok(nombre);
+                ItemResponse<HikingRoute> response = await this.ContainerClient().CreateItemAsync<HikingRoute>(newRoute, new PartitionKey(newRoute.Id));
+                return Created("", response.Resource);
             }
 
             return BadRequest();
-
-
         }
 
-        [HttpPost]
-        public ActionResult CreateNewRoute([FromBody] Models.HikingRoute newRoute)
+        #endregion
+
+        #region PUT
+
+        // Update a route
+        [HttpPut("{id}")]
+        public async Task<ActionResult> UpdateRoute(string id, [FromBody] HikingRoute route)
         {
-            if (newRoute != null)
-                return Created("", newRoute);
+            ItemResponse<HikingRoute> response = await this.ContainerClient().ReadItemAsync<HikingRoute>(id, new PartitionKey(id));
+            if (response != null)
+            {
+                response.Resource.Name = route.Name;
+                response.Resource.Difficulty = route.Difficulty;
+                response.Resource.EstimatedDuration = route.EstimatedDuration;
+                response.Resource.DistanceInKilometers = route.DistanceInKilometers;
+                response.Resource.StartingPoint = route.StartingPoint;
+                response.Resource.EndingPoint = route.EndingPoint;
+                response.Resource.Description = route.Description;
+                response.Resource.ImageUrl = route.ImageUrl;
+                response.Resource.GpxFileUrl = route.GpxFileUrl;
+                response.Resource.Tags = route.Tags;
+
+
+                response = await this.ContainerClient().ReplaceItemAsync<HikingRoute>(response.Resource, response.Resource.Id, new PartitionKey(response.Resource.Id));
+                return Ok(response.Resource);
+            }
 
             return BadRequest();
-
         }
 
-        [HttpDelete]
-        public ActionResult DeleteRoutes()
-        {
-            bool badThingHappened = false;
+        #endregion
 
-            if (badThingHappened)
-                return BadRequest();
+        #region Delete
+        // Delete a route 
+        [HttpDelete("{id}")]
+        public async Task<ActionResult> DeleteRoute(string id)
+        {
+            ItemResponse<HikingRoute> response = await this.ContainerClient().DeleteItemAsync<HikingRoute>(id, new PartitionKey(id));
+            return NoContent();
+        }
+
+        // Delete all routes
+        [HttpPost]
+        [Route("delete")]
+        public async Task<ActionResult> DeleteRoutes()
+        {
+            var sqlQueryText = "SELECT * FROM routes";
+            QueryDefinition queryDefinition = new QueryDefinition(sqlQueryText);
+            FeedIterator<HikingRoute> queryResultSetIterator = this.ContainerClient().GetItemQueryIterator<HikingRoute>(queryDefinition);
+
+            List<HikingRoute> routes = new List<HikingRoute>();
+
+            while (queryResultSetIterator.HasMoreResults)
+            {
+                FeedResponse<HikingRoute> currentResultSet = await queryResultSetIterator.ReadNextAsync();
+                foreach (HikingRoute route in currentResultSet)
+                {
+                    routes.Add(route);
+                }
+            }
+
+            foreach (HikingRoute route in routes)
+            {
+                await this.ContainerClient().DeleteItemAsync<HikingRoute>(route.Id, new PartitionKey(route.Id));
+            }
 
             return NoContent();
         }
+
+        #endregion  
     }
 }
