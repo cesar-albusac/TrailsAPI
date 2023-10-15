@@ -3,23 +3,17 @@ using Azure.Security.KeyVault.Secrets;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Cosmos;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Routes.Models;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Net;
-using static System.Net.WebRequestMethods;
-
 namespace Routes.Controllers
 {
     [Route("/api/[controller]")]
     [ApiController]
     public class RoutesController : ControllerBase
     {
-
-
-        // The name of the database and container we will create
-        string databaseId = "HikingRoutes";
-        string containerId = "Routes";
-
         private async Task AddItemsToContainerAsync()
         {
             // Create a family object for the Andersen family
@@ -67,8 +61,13 @@ namespace Routes.Controllers
         }
 
         string kvUri = Environment.GetEnvironmentVariable("VaultUri");
-        private Container ContainerClient()
+        private Container ContainerProductionClientKeyVault()
         {
+            //get appsettings property values
+            var config = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
+            string databaseId = config["CosmosDBSettings:DatabaseName"];
+            string containerId = config["CosmosDBSettings:RoutesCollection"];
+
             var client = new SecretClient(new Uri(kvUri), new DefaultAzureCredential());
             string[] cosmosSecrets = client.GetSecret("ConnectionStrings").Value.Value.Split(';');
             Dictionary<string, string> secrets = new Dictionary<string, string>();
@@ -80,6 +79,20 @@ namespace Routes.Controllers
             }
 
             var cosmosDbClient = new CosmosClient(secrets["AccountEndpoint"], secrets["AccountKey"], new CosmosClientOptions() { ApplicationName = "CosmosDBDotnetQuickstart" });
+            Container containerClient = cosmosDbClient.GetContainer(databaseId, containerId);
+            return containerClient;
+        }
+
+        private Container ContainerClient()
+        {
+            //get appsettings property values
+            var config = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
+            string databaseId = config["CosmosDBSettings:DatabaseName"];
+            string containerId = config["CosmosDBSettings:RoutesCollection"];
+            string accountEndpoint = config["CosmosDBSettings:EndpointUri"];
+            string accountKey = config["CosmosDBSettings:PrimaryKey"];
+
+            var cosmosDbClient = new CosmosClient(accountEndpoint, accountKey, new CosmosClientOptions() { ApplicationName = "CosmosDBDotnetQuickstart" });
             Container containerClient = cosmosDbClient.GetContainer(databaseId, containerId);
             return containerClient;
         }
