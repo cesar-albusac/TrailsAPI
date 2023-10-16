@@ -8,7 +8,7 @@
     public class HikingRoute
     {
         // Properties
-        [JsonProperty(PropertyName = "id")]
+        [JsonProperty("id")]
         public string Id { get; set; }
         public string Name { get; set; }
         public double DistanceInKilometers { get; set; }

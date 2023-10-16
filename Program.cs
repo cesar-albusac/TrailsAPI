@@ -1,9 +1,38 @@
 using Azure.Identity;
+using Microsoft.Azure.Cosmos;
+using Recipes.Data;
+
 var builder = WebApplication.CreateBuilder(args);
+var configuration = builder.Configuration;
 
 // Add services to the container.
-
 builder.Services.AddControllers();
+builder.Services.AddSingleton((provider) =>
+{
+    var endpoint = configuration["CosmosDb:Endpoint"];
+    var primaryKey = configuration["CosmosDb:PrimaryKey"];
+    var databaseName = configuration["CosmosDb:DatabaseName"];
+
+    var containerName = configuration["CosmosDb:ContainerName"];
+    var cosmosClientOptions = new CosmosClientOptions()
+    {
+        SerializerOptions = new CosmosSerializationOptions()
+        {
+            PropertyNamingPolicy = CosmosPropertyNamingPolicy.CamelCase
+        }
+    };
+
+    var loggerFactory = LoggerFactory.Create(builder =>
+    {
+        builder.AddConsole();
+    });
+
+    var cosmosClient = new CosmosClient(endpoint, primaryKey, cosmosClientOptions);
+    return cosmosClient;
+});
+
+builder.Services.AddSingleton<IRouteRepository, RouteRepository>();
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

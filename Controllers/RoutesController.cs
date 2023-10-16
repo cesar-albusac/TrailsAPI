@@ -4,16 +4,66 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Cosmos;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Recipes.Data;
 using Routes.Models;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Net;
+using System.Xml;
+
 namespace Routes.Controllers
 {
     [Route("/api/[controller]")]
     [ApiController]
     public class RoutesController : ControllerBase
     {
+        private readonly IRouteRepository _routeRepository;
+        public RoutesController(IRouteRepository routeRepository)
+        {
+            this._routeRepository = routeRepository;
+        
+        }
+
+        //Get .gpx files from folder
+        private void GetGPXfiles(string folderPath)
+        {
+            string[] filePaths = Directory.GetFiles(folderPath, "*.gpx");
+            foreach (string filePath in filePaths)
+            {
+                ExtractDataFromGPX(filePath);
+            }
+        }
+
+        // Extract data from gpx file like total distance, elevation, etc.
+        private void ExtractDataFromGPX(string filePath)
+        {
+            // Create a new XmlDocument  
+            XmlDocument doc = new XmlDocument();
+
+            // Load data  
+            doc.Load(filePath);
+
+            // Create a namespace manager  
+            XmlNamespaceManager nsmgr = new XmlNamespaceManager(doc.NameTable);
+
+            // Add the namespaces used in books.xml to the XmlNamespaceManager.  
+            nsmgr.AddNamespace("x", "http://www.topografix.com/GPX/1/1");
+            nsmgr.AddNamespace("gpxtpx", "http://www.garmin.com/xmlschemas/TrackPointExtension/v1");
+
+            // Get the first book written by an author whose last name is Atwood.  
+            XmlNodeList nodes = doc.SelectNodes("//x:gpx/x:trk/x:trkseg/x:trkpt", nsmgr);
+
+            // Display all the book titles.  
+            foreach (XmlNode node in nodes)
+            {
+                Console.WriteLine(node.Attributes["lat"].Value);
+                Console.WriteLine(node.Attributes["lon"].Value);
+                Console.WriteLine(node.SelectSingleNode("x:ele", nsmgr).InnerText);
+                Console.WriteLine(node.SelectSingleNode("x:time", nsmgr).InnerText);
+                Console.WriteLine(node.SelectSingleNode("gpxtpx:hr", nsmgr).InnerText);
+            }
+        }   
+
         private async Task AddItemsToContainerAsync()
         {
             // Create a family object for the Andersen family
@@ -85,6 +135,7 @@ namespace Routes.Controllers
 
         private Container ContainerClient()
         {
+            GetGPXfiles(Directory.GetCurrentDirectory() + "\\RutasToInsert");
             //get appsettings property values
             var config = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
             string databaseId = config["CosmosDBSettings:DatabaseName"];
@@ -100,35 +151,9 @@ namespace Routes.Controllers
         #region GET
         // Get all routes
         [HttpGet]
-        public async Task<ActionResult> GetRoutes([FromQuery] int count)
+        public async Task<ActionResult<IEnumerable<HikingRoute>>> GetAllRoutes(/*[FromQuery] int count*/)
         {
-            var totalCount = "SELECT VALUE COUNT(1) FROM c";
-            QueryDefinition totalCountQueryDefinition = new QueryDefinition(totalCount);
-            var resultSetIterator = this.ContainerClient().GetItemQueryIterator<int>(totalCountQueryDefinition);
-
-            var sqlQueryText = "SELECT * FROM routes";
-            if (count != 0)
-            {
-                sqlQueryText += string.Format("OFFSET 0 LIMIT {0}", count);
-            }
-
-            Console.WriteLine("Running query: {0}\n", sqlQueryText);
-
-            QueryDefinition queryDefinition = new QueryDefinition(sqlQueryText);
-
-            FeedIterator<HikingRoute> queryResultSetIterator = this.ContainerClient().GetItemQueryIterator<HikingRoute>(queryDefinition);
-
-            List<HikingRoute> routes = new List<HikingRoute>();
-
-            while (queryResultSetIterator.HasMoreResults)
-            {
-                FeedResponse<HikingRoute> currentResultSet = await queryResultSetIterator.ReadNextAsync();
-                foreach (HikingRoute route in currentResultSet)
-                {
-                    routes.Add(route);
-                }
-            }
-
+            var routes = await _routeRepository.GetAllRoutesAsync();
             return Ok(routes);
         }
 
