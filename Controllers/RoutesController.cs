@@ -19,10 +19,11 @@ namespace Routes.Controllers
     {
         private readonly IRouteRepository _routeRepository;
         private readonly ILogger _logger;
-        public RoutesController(ILogger logerManager, IRouteRepository routeRepository)
+
+        public RoutesController(ILogger<RoutesController> logger, IRouteRepository routeRepository)
         {
             this._routeRepository = routeRepository;
-            this._logger = logerManager;
+            this._logger = logger;
         
         }
 

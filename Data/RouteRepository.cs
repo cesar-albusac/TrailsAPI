@@ -13,8 +13,8 @@ namespace Recipes.Data
         {
             this.cosmosClient = cosmosClient;
             this.configuration = configuration;
-            var databaseName = configuration["CosmosDb:DatabaseName"];
-            var containerName = configuration["CosmosDb:ContainerName"];
+            var databaseName = configuration["CosmosDBSettings:DatabaseName"];
+            var containerName = configuration["CosmosDBSettings:ContainerName"];
             this.container = this.cosmosClient.GetContainer(databaseName, containerName);
         }
 

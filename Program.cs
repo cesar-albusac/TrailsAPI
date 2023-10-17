@@ -9,11 +9,11 @@ var configuration = builder.Configuration;
 builder.Services.AddControllers();
 builder.Services.AddSingleton((provider) =>
 {
-    var endpoint = configuration["CosmosDb:Endpoint"];
-    var primaryKey = configuration["CosmosDb:PrimaryKey"];
-    var databaseName = configuration["CosmosDb:DatabaseName"];
+    var endpoint = configuration["CosmosDBSettings:EndpointUri"];
+    var primaryKey = configuration["CosmosDBSettings:PrimaryKey"];
+    var databaseName = configuration["CosmosDBSettings:DatabaseName"];
 
-    var containerName = configuration["CosmosDb:ContainerName"];
+    var containerName = configuration["CosmosDBSettings:ContainerName"];
     var cosmosClientOptions = new CosmosClientOptions()
     {
         SerializerOptions = new CosmosSerializationOptions()
