@@ -77,10 +77,15 @@ namespace Routes.Controllers
         {
             try
             {
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest("Invalid model object");
+                }
+
                 if (newRoute != null)
                 {
                     var result = await _routeRepository.AddRouteAsync(newRoute);
-                    return Ok(result);
+                    return Created("", result);
                 }
 
                 return BadRequest();
@@ -105,6 +110,11 @@ namespace Routes.Controllers
         {
             try
             {
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest("Invalid model object");
+                }
+
                 if (route == null || route.Id == null)
                 {
                     return BadRequest();
