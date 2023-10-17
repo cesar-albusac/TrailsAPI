@@ -164,27 +164,8 @@ namespace Routes.Controllers
             if (id < 1)
                 return BadRequest();
 
-            var sqlQueryText = "SELECT * FROM routes r WHERE r.id = @id";
-            QueryDefinition queryDefinition = new QueryDefinition(sqlQueryText).WithParameter("@id", id);
-            FeedIterator<HikingRoute> queryResultSetIterator = this.ContainerClient().GetItemQueryIterator<HikingRoute>(queryDefinition);
-
-            List<HikingRoute> routes = new List<HikingRoute>();
-
-            while (queryResultSetIterator.HasMoreResults)
-            {
-                FeedResponse<HikingRoute> currentResultSet = await queryResultSetIterator.ReadNextAsync();
-                foreach (HikingRoute route in currentResultSet)
-                {
-                    routes.Add(route);
-                }
-            }
-
-            if(routes.Count == 0)
-            {
-                return NotFound();
-            }
-
-            return Ok(routes);
+            var route = await _routeRepository.GetRouteAsync(id.ToString());
+            return Ok(route);
         }
 
 
@@ -199,8 +180,8 @@ namespace Routes.Controllers
         {
             if (newRoute != null)
             {
-                ItemResponse<HikingRoute> response = await this.ContainerClient().CreateItemAsync<HikingRoute>(newRoute, new PartitionKey(newRoute.Id));
-                return Created("", response.Resource);
+                var result = await _routeRepository.AddRouteAsync(newRoute);
+                return Ok(result);
             }
 
             return BadRequest();
@@ -282,7 +263,7 @@ namespace Routes.Controllers
 
         #endregion
 
-        #region Delete
+        #region DELETE
         // Delete a route 
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteRoute(int id)
@@ -292,7 +273,7 @@ namespace Routes.Controllers
                 return BadRequest();
             }
 
-            ItemResponse<HikingRoute> response = await this.ContainerClient().DeleteItemAsync<HikingRoute>(id.ToString(), new PartitionKey(id));
+            await _routeRepository.DeleteRouteAsync(id.ToString());
             return NoContent();
         }
 
@@ -300,25 +281,7 @@ namespace Routes.Controllers
         [HttpDelete]
         public async Task<ActionResult> DeleteAllRoutes()
         {
-            var sqlQueryText = "SELECT * FROM routes";
-            QueryDefinition queryDefinition = new QueryDefinition(sqlQueryText);
-            FeedIterator<HikingRoute> queryResultSetIterator = this.ContainerClient().GetItemQueryIterator<HikingRoute>(queryDefinition);
-
-            List<HikingRoute> routes = new List<HikingRoute>();
-
-            while (queryResultSetIterator.HasMoreResults)
-            {
-                FeedResponse<HikingRoute> currentResultSet = await queryResultSetIterator.ReadNextAsync();
-                foreach (HikingRoute route in currentResultSet)
-                {
-                    routes.Add(route);
-                }
-            }
-
-            foreach(HikingRoute route in routes)
-            {
-                await this.ContainerClient().DeleteItemAsync<HikingRoute>(route.Id, new PartitionKey(route.Id));
-            }
+            await _routeRepository.DeleteAllRoutesAsync();
 
             return NoContent();
         }   
