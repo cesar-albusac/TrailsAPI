@@ -1,6 +1,6 @@
 using Azure.Identity;
 using Microsoft.Azure.Cosmos;
-using Recipes.Data;
+using Trails.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
@@ -31,7 +31,7 @@ builder.Services.AddSingleton((provider) =>
     return cosmosClient;
 });
 
-builder.Services.AddSingleton<IRouteRepository, RouteRepository>();
+builder.Services.AddSingleton<ITrailRepository, TrailRepository>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
