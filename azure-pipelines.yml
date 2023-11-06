@@ -39,6 +39,6 @@ steps:
   displayName: 'Publish NuGet package'
   inputs:
     command: push
-    feedPublish: '$(System.TeamProject)/TrailsAPI'
+    feedPublish: '$(System.TeamProject)/Trail.Models'
     allowPackageConflicts: true
   condition: succeeded()
