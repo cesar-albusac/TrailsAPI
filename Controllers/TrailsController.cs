@@ -11,7 +11,7 @@ namespace Trails.Controllers
 {
     [Route("/api/[controller]")]
     [ApiController]
-    public class TrailsController : ControllerBase
+    public class TrailsController : ControllerBase, ITrail 
     {
         private readonly ITrailRepository _TrailRepository;
         private readonly ILogger _logger;
