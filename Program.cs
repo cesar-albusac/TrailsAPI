@@ -31,6 +31,8 @@ builder.Services.AddSingleton((provider) =>
     return cosmosClient;
 });
 
+// Add the Log service to the builder
+
 builder.Services.AddSingleton<ITrailRepository, TrailRepository>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

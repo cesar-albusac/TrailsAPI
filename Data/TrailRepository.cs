@@ -8,14 +8,16 @@ namespace Trails.Data
         private readonly CosmosClient cosmosClient;
         private readonly IConfiguration configuration;
         private readonly Container container;
+        private readonly ILogger _logger;
 
-        public TrailRepository(CosmosClient cosmosClient, IConfiguration configuration)
+        public TrailRepository(CosmosClient cosmosClient, IConfiguration configuration, ILogger<TrailRepository> logger)
         {
             this.cosmosClient = cosmosClient;
             this.configuration = configuration;
             var databaseName = configuration["CosmosDBSettings:DatabaseName"];
             var containerName = configuration["CosmosDBSettings:ContainerName"];
             this.container = this.cosmosClient.GetContainer(databaseName, containerName);
+            _logger = logger;
         }
 
         #region GET Methods
@@ -83,8 +85,17 @@ namespace Trails.Data
         #region POST Methods
         public async Task<Trail> AddTrailAsync(Trail Trail)
         {
-            ItemResponse<Trail> response = await this.container.CreateItemAsync<Trail>(Trail, new PartitionKey(Trail.Id));
-            return response.Resource;
+            try
+            {
+                ItemResponse<Trail> response = await this.container.CreateItemAsync<Trail>(Trail, new PartitionKey(Trail.Id));
+                return response.Resource;
+            }
+            catch(Exception e)
+            {
+                _logger.LogInformation(e.Message);
+                throw e;
+            }
+           
         }
 
         #endregion
