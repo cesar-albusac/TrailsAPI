@@ -46,7 +46,7 @@ namespace Trails.Data
             return Trails;
         }
 
-        public async Task<Trail> GetTrailAsync(string id)
+        public async Task<Trail?> GetTrailAsync(string id)
         {
             try
             {
@@ -83,7 +83,7 @@ namespace Trails.Data
         #endregion
 
         #region POST Methods
-        public async Task<Trail> AddTrailAsync(Trail Trail)
+        public async Task<Trail?> AddTrailAsync(Trail Trail)
         {
             try
             {
@@ -93,7 +93,7 @@ namespace Trails.Data
             catch(Exception e)
             {
                 _logger.LogInformation(e.Message);
-                throw e;
+                return null;
             }
            
         }
@@ -102,7 +102,7 @@ namespace Trails.Data
 
         #region PUT Methods
 
-        public async Task<Trail> UpdateTrailAsync(Trail Trail)
+        public async Task<Trail?> UpdateTrailAsync(Trail Trail)
         {
             ItemResponse<Trail> response = await this.container.UpsertItemAsync<Trail>(Trail, new PartitionKey(Trail.Id));
             return response.Resource;

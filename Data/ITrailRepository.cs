@@ -6,11 +6,11 @@ namespace Trails.Data
     {
         Task<IEnumerable<Trail>> GetAllTrailsAsync();
 
-        Task<Trail> GetTrailAsync(string id);
+        Task<Trail?> GetTrailAsync(string id);
 
-        Task<Trail> AddTrailAsync(Trail Trail);
+        Task<Trail?> AddTrailAsync(Trail Trail);
 
-        Task<Trail> UpdateTrailAsync(Trail Trail);
+        Task<Trail?> UpdateTrailAsync(Trail Trail);
 
         Task DeleteTrailAsync(string id);
 
