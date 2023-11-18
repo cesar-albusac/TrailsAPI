@@ -4,6 +4,7 @@
     using Newtonsoft.Json;
     using System;
     using System.Collections.Generic;
+    using System.ComponentModel.DataAnnotations;
 
     public class Trail
     {
@@ -38,10 +39,12 @@
         public string? Description { get; set; }
 
         [JsonProperty("imageFile")]
-        public string? ImageFile { get; set;}
+        [Display(Name = "Portada")]
+        public IFormFile? ImageFile { get; set;}
 
         [JsonProperty("gpxFile")]
-        public string? GPXFile { get; set;}
+        [Display(Name = "Archivo GPX")]
+        public IFormFile? GPXFile { get; set;}
 
         public class Waypoint
         {
