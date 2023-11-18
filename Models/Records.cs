@@ -75,7 +75,7 @@
         }
 
         // implement all constructors
-        public Trail(string name, double distance, double duration, double elevationGain, double elevationLoss, double maxElevation, double minElevation, DifficultyLevel difficulty, string description, string imageUrl, string gpxUrl)
+        public Trail(string name, double distance, double duration, double elevationGain, double elevationLoss, double maxElevation, double minElevation, DifficultyLevel difficulty, string description, IFormFile imageUrl, IFormFile gpxUrl)
         {
             Name = name;
             Distance = distance;
