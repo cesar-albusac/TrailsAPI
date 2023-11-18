@@ -37,11 +37,11 @@
         [JsonProperty("description")]
         public string? Description { get; set; }
 
-        [JsonProperty("imageurl")]
-        public string? ImageUrl { get; set;}
+        [JsonProperty("imageFile")]
+        public string? ImageFile { get; set;}
 
-        [JsonProperty("gpxurl")]
-        public string? GpxUrl { get; set;}
+        [JsonProperty("gpxFile")]
+        public string? GPXFile { get; set;}
 
         public class Waypoint
         {
@@ -83,8 +83,8 @@
             MinElevation = minElevation;
             Difficulty = difficulty;
             Description = description;
-            ImageUrl = imageUrl;
-            GpxUrl = gpxUrl;
+            ImageFile = imageUrl;
+            GPXFile = gpxUrl;
         }
 
         // Constructor

@@ -16,6 +16,8 @@ namespace Trails.Controllers
         private readonly ITrailRepository _TrailRepository;
         private readonly ILogger _logger;
 
+  
+
         public TrailsController(ILogger<TrailsController> logger, ITrailRepository TrailRepository)
         {
             this._TrailRepository = TrailRepository;
