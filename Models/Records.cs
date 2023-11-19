@@ -42,9 +42,15 @@
         [Display(Name = "Portada")]
         public IFormFile? ImageFile { get; set;}
 
+        [JsonProperty("imageUrl")]
+        public Uri ImageUrl { get; set; }
+
         [JsonProperty("gpxFile")]
         [Display(Name = "Archivo GPX")]
         public IFormFile? GPXFile { get; set;}
+
+        [JsonProperty("GPXUrl")]
+        public Uri GPXUrl { get; set; }
 
         public class Waypoint
         {
