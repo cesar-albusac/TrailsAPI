@@ -10,30 +10,30 @@
     {
         // Properties
         [JsonProperty("id")]
-        public string? Id { get; set; }
+        public string Id { get; set; }
 
         [JsonProperty("name")]
-        public string? Name { get; set; }
+        public string Name { get; set; }
 
         [JsonProperty("distance")]
-        public double Distance { get; set; }
+        public double? Distance { get; set; }
 
         [JsonProperty("duration")]
-        public double Duration { get; set; }
+        public double? Duration { get; set; }
 
         [JsonProperty("elevationgain")]
-        public double ElevationGain { get; set; }
+        public double? ElevationGain { get; set; }
 
         [JsonProperty("elevationloss")]
-        public double ElevationLoss { get; set; }
+        public double? ElevationLoss { get; set; }
 
         [JsonProperty("maxelevation")]
-        public double MaxElevation { get; set; }
+        public double? MaxElevation { get; set; }
 
         [JsonProperty("minelevation")]
-        public double MinElevation { get; set; }
+        public double? MinElevation { get; set; }
 
-        public DifficultyLevel Difficulty { get; set; }
+        public DifficultyLevel? Difficulty { get; set; }
 
         [JsonProperty("description")]
         public string? Description { get; set; }
@@ -43,14 +43,14 @@
         public IFormFile? ImageFile { get; set;}
 
         [JsonProperty("imageUrl")]
-        public Uri ImageUrl { get; set; }
+        public Uri? ImageUrl { get; set; }
 
         [JsonProperty("gpxFile")]
         [Display(Name = "Archivo GPX")]
         public IFormFile? GPXFile { get; set;}
 
         [JsonProperty("GPXUrl")]
-        public Uri GPXUrl { get; set; }
+        public Uri? GPXUrl { get; set; }
 
         public class Waypoint
         {
