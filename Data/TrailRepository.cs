@@ -87,7 +87,7 @@ namespace Trails.Data
         {
             try
             {
-                ItemResponse<Trail> response = await this.container.CreateItemAsync<Trail>(Trail, new PartitionKey(Trail.Id));
+                ItemResponse<Trail> response = await this.container.CreateItemAsync<Trail>(Trail);
                 return response.Resource;
             }
             catch(Exception e)
@@ -104,7 +104,7 @@ namespace Trails.Data
 
         public async Task<Trail?> UpdateTrailAsync(Trail Trail)
         {
-            ItemResponse<Trail> response = await this.container.UpsertItemAsync<Trail>(Trail, new PartitionKey(Trail.Id));
+            ItemResponse<Trail> response = await this.container.UpsertItemAsync<Trail>(Trail);
             return response.Resource;
         }
 
@@ -124,14 +124,13 @@ namespace Trails.Data
 
             FeedIterator<Trail> queryResultSetIterator = this.container.GetItemQueryIterator<Trail>(queryDefinition);
 
-            List<Trail> Trails = new List<Trail>();
 
             while (queryResultSetIterator.HasMoreResults)
             {
                 FeedResponse<Trail> currentResultSet = await queryResultSetIterator.ReadNextAsync();
-                foreach (Trail Trail in currentResultSet)
+                foreach (Trail trail in currentResultSet)
                 {
-                    await this.container.DeleteItemAsync<Trail>(Trail.Id, new PartitionKey(Trail.Id));
+                    await this.container.DeleteItemAsync<Trail>(trail.Name, new PartitionKey(trail.Name));
                 }
             }   
         }

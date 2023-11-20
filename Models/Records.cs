@@ -9,9 +9,6 @@
     public class Trail
     {
         // Properties
-        [JsonProperty("id")]
-        public string Id { get; set; }
-
         [JsonProperty("name")]
         public string Name { get; set; }
 
@@ -67,11 +64,6 @@
         }
 
         public Trail() { }
-
-        public Trail(string id) 
-        {
-            Id = id;
-        }
 
         // Constructor 2 parameters
         public Trail(string name, double distance)
