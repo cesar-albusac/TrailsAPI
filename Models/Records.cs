@@ -1,5 +1,6 @@
 ﻿namespace Trails.Models
 {
+    using Microsoft.AspNetCore.Mvc;
     using Microsoft.EntityFrameworkCore.Metadata.Internal;
     using Newtonsoft.Json;
     using System;
@@ -38,14 +39,16 @@
         [JsonProperty("description")]
         public string? Description { get; set; }
 
-        [JsonIgnore]
+        [System.Text.Json.Serialization.JsonIgnore]
+        [HiddenInput]
         [Display(Name = "Portada")]
         public IFormFile? ImageFile { get; set;}
 
         [JsonProperty("imageUrl")]
         public Uri? ImageUrl { get; set; }
 
-        [JsonIgnore]
+        [System.Text.Json.Serialization.JsonIgnore]
+        [HiddenInput]
         [Display(Name = "Archivo GPX")]
         public IFormFile? GPXFile { get; set;}
 
