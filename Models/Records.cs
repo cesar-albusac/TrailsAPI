@@ -38,14 +38,14 @@
         [JsonProperty("description")]
         public string? Description { get; set; }
 
-        [JsonProperty("imageFile")]
+        [JsonIgnore]
         [Display(Name = "Portada")]
         public IFormFile? ImageFile { get; set;}
 
         [JsonProperty("imageUrl")]
         public Uri? ImageUrl { get; set; }
 
-        [JsonProperty("gpxFile")]
+        [JsonIgnore]
         [Display(Name = "Archivo GPX")]
         public IFormFile? GPXFile { get; set;}
 
