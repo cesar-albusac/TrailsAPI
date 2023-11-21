@@ -124,13 +124,14 @@ namespace Trails.Data
 
             FeedIterator<Trail> queryResultSetIterator = this.container.GetItemQueryIterator<Trail>(queryDefinition);
 
+            List<Trail> Trails = new List<Trail>();
 
             while (queryResultSetIterator.HasMoreResults)
             {
                 FeedResponse<Trail> currentResultSet = await queryResultSetIterator.ReadNextAsync();
-                foreach (Trail trail in currentResultSet)
+                foreach (Trail Trail in currentResultSet)
                 {
-                    await this.container.DeleteItemAsync<Trail>(trail.Name, new PartitionKey(trail.Name));
+                    await this.container.DeleteItemAsync<Trail>(Trail.Id, new PartitionKey(Trail.Id));
                 }
             }   
         }

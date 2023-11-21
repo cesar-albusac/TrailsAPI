@@ -8,6 +8,9 @@
 
     public class Trail
     {
+        [JsonProperty("id")]
+        public string? Id { get; set; }
+
         // Properties
         [JsonProperty("name")]
         public string Name { get; set; }

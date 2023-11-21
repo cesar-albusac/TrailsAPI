@@ -114,7 +114,7 @@ namespace Trails.Controllers
                     return BadRequest("Invalid model object");
                 }
 
-                if (Trail == null)
+                if (Trail == null || Trail.Id == null)
                 {
                     return BadRequest();
                 }
