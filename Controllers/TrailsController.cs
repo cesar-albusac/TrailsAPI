@@ -45,11 +45,11 @@ namespace Trails.Controllers
 
         // Get Trail by id
         [HttpGet("{id}")]
-        public async Task<ActionResult> GetTrailById(int id)
+        public async Task<ActionResult> GetTrailById(string? id)
         {
             try
             {
-                if (id < 1)
+                if (id == null)
                     return BadRequest();
 
                 var Trail = await _TrailRepository.GetTrailAsync(id.ToString());
@@ -136,11 +136,11 @@ namespace Trails.Controllers
         #region DELETE
         // Delete a Trail 
         [HttpDelete("{id}")]
-        public async Task<ActionResult> DeleteTrail(int id)
+        public async Task<ActionResult> DeleteTrail(string? id)
         {
             try
             {
-                if (id <= 0)
+                if (id == null)
                 {
                     return BadRequest();
                 }
