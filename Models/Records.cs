@@ -45,7 +45,7 @@
         public IFormFile? ImageFile { get; set;}
 
         [JsonProperty("imageUrl")]
-        public Uri? ImageUrl { get; set; }
+        public string? ImageUrl { get; set; }
 
         [System.Text.Json.Serialization.JsonIgnore]
         [HiddenInput]
@@ -53,7 +53,7 @@
         public IFormFile? GPXFile { get; set;}
 
         [JsonProperty("GPXUrl")]
-        public Uri? GPXUrl { get; set; }
+        public string? GPXUrl { get; set; }
 
         public class Waypoint
         {
