@@ -1,4 +1,5 @@
 using Azure.Identity;
+using Azure.Security.KeyVault.Secrets;
 using Microsoft.Azure.Cosmos;
 using Trails.Data;
 
@@ -7,13 +8,27 @@ var configuration = builder.Configuration;
 
 // Add services to the container.
 builder.Services.AddControllers();
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(
+    policy =>
+    {
+        policy.WithOrigins("https://trailsstorageaccount.blob.core.windows.net", "https://localhost:7145");
+    });
+});
+
 builder.Services.AddSingleton((provider) =>
 {
-    var endpoint = configuration["CosmosDBSettings:EndpointUri"];
-    var primaryKey = configuration["CosmosDBSettings:PrimaryKey"];
-    var databaseName = configuration["CosmosDBSettings:DatabaseName"];
+    SecretClientOptions options = new SecretClientOptions();
 
-    var containerName = configuration["CosmosDBSettings:ContainerName"];
+    SecretClient client = new SecretClient(new Uri("https://hikingtrailskeyvault.vault.azure.net/"), new DefaultAzureCredential(), options);
+
+    KeyVaultSecret endpointSecret = client.GetSecret("cosmos-endpoint");
+    KeyVaultSecret primarykeySecret = client.GetSecret("cosmos-primarykey");
+
+    var endpoint = endpointSecret.Value;
+    var primaryKey = primarykeySecret.Value;
+
     var cosmosClientOptions = new CosmosClientOptions()
     {
         SerializerOptions = new CosmosSerializationOptions()
@@ -47,7 +62,7 @@ if (app.Environment.IsDevelopment())
 
     app.UseSwaggerUI();
 }
-
+app.UseCors();
 app.UseHttpsRedirection();
 
 app.UseAuthorization();

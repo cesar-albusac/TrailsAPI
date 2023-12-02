@@ -26,8 +26,6 @@ namespace Trails.Data
         {
             var sqlQueryText = "SELECT * FROM Trails";
  
-            Console.WriteLine("Running query: {0}\n", sqlQueryText);
-
             QueryDefinition queryDefinition = new QueryDefinition(sqlQueryText);
 
             FeedIterator<Trail> queryResultSetIterator = this.container.GetItemQueryIterator<Trail>(queryDefinition);
