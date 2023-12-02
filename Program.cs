@@ -1,6 +1,7 @@
 using Azure.Identity;
 using Azure.Security.KeyVault.Secrets;
 using Microsoft.Azure.Cosmos;
+using System.Net.Sockets;
 using Trails.Data;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -19,15 +20,31 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddSingleton((provider) =>
 {
-    SecretClientOptions options = new SecretClientOptions();
+    string? endpoint = null;
+    string primaryKey = null;
+    using (var tcpClient = new TcpClient())
+    {
+        try // If Cosmos DB Emulator is running use the local container
+        {
+            tcpClient.Connect("localhost", 8081);
+            var containerName = configuration["CosmosDBSettings:ContainerName"];
+            endpoint = configuration["CosmosDBSettings:EndpointUri"];
+            primaryKey = configuration["CosmosDBSettings:PrimaryKey"];
+            var databaseName = configuration["CosmosDBSettings:DatabaseName"];
+        }
+        catch (Exception)
+        {
+            SecretClientOptions options = new SecretClientOptions();
 
-    SecretClient client = new SecretClient(new Uri("https://hikingtrailskeyvault.vault.azure.net/"), new DefaultAzureCredential(), options);
+            SecretClient client = new SecretClient(new Uri("https://hikingtrailskeyvault.vault.azure.net/"), new DefaultAzureCredential(), options);
+            KeyVaultSecret endpointSecret = client.GetSecret("cosmos-endpoint");
+            KeyVaultSecret primarykeySecret = client.GetSecret("cosmos-primarykey");
 
-    KeyVaultSecret endpointSecret = client.GetSecret("cosmos-endpoint");
-    KeyVaultSecret primarykeySecret = client.GetSecret("cosmos-primarykey");
+            endpoint = endpointSecret.Value;
+            primaryKey = primarykeySecret.Value;
+        }
+    }
 
-    var endpoint = endpointSecret.Value;
-    var primaryKey = primarykeySecret.Value;
 
     var cosmosClientOptions = new CosmosClientOptions()
     {
