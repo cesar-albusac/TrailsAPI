@@ -362,3 +362,6 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 *.GPX
+/appsettings.Development.json
+/Properties/ServiceDependencies/TrailsAPI20231226183957 - Web Deploy/profile.arm.json
+/Properties/ServiceDependencies/trailsapi - Zip Deploy/profile.arm.json
