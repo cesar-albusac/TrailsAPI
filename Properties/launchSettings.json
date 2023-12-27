@@ -1,30 +1,12 @@
 {
   "$schema": "https://json.schemastore.org/launchsettings.json",
-  "iisSettings": {
-    "windowsAuthentication": false,
-    "anonymousAuthentication": true,
-    "iisExpress": {
-      "applicationUrl": "http://localhost:54280",
-      "sslPort": 44373
-    }
-  },
   "profiles": {
     "Routes": {
       "commandName": "Project",
       "dotnetRunMessages": true,
-      "launchBrowser": false,
-      "launchUrl": "swagger",
-      "applicationUrl": "https://localhost:7224;http://localhost:5287",
-      "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development",
-        "VaultUri": "https://routesvault.vault.azure.net/",
-        "AZURE_USERNAME": "cesypozo@hotmail.com"
-      }
-    },
-    "IIS Express": {
-      "commandName": "IISExpress",
       "launchBrowser": true,
       "launchUrl": "swagger",
+      "applicationUrl": "https://localhost:7224",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
         "VaultUri": "https://routesvault.vault.azure.net/",

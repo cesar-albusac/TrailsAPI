@@ -24,25 +24,12 @@ builder.Services.AddSingleton((provider) =>
     string primaryKey = null;
     using (var tcpClient = new TcpClient())
     {
-        try // If Cosmos DB Emulator is running use the local container
-        {
-            tcpClient.Connect("localhost", 8081);
-            var containerName = configuration["CosmosDBSettings:ContainerName"];
-            endpoint = configuration["CosmosDBSettings:EndpointUri"];
-            primaryKey = configuration["CosmosDBSettings:PrimaryKey"];
-            var databaseName = configuration["CosmosDBSettings:DatabaseName"];
-        }
-        catch (Exception)
-        {
-            SecretClientOptions options = new SecretClientOptions();
+        SecretClientOptions options = new SecretClientOptions();
+        string? endpointSecret = configuration["cosmos_endpoint"];
+        string primarykeySecret = configuration["cosmos_primarykey"];
 
-            SecretClient client = new SecretClient(new Uri("https://hikingtrailskeyvault.vault.azure.net/"), new DefaultAzureCredential(), options);
-            KeyVaultSecret endpointSecret = client.GetSecret("cosmos-endpoint");
-            KeyVaultSecret primarykeySecret = client.GetSecret("cosmos-primarykey");
-
-            endpoint = endpointSecret.Value;
-            primaryKey = primarykeySecret.Value;
-        }
+        endpoint = endpointSecret;
+        primaryKey = primarykeySecret;
     }
 
 
@@ -73,6 +60,7 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 app.UseSwagger();
+app.UseSwaggerUI();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {

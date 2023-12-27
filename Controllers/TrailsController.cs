@@ -9,7 +9,7 @@ using Trails.Models;
 
 namespace Trails.Controllers
 {
-    [Route("/api/[controller]")]
+    [Route("/[controller]")]
     [ApiController]
     public class TrailsController : ControllerBase 
     {
