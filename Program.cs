@@ -21,15 +21,15 @@ builder.Services.AddCors(options =>
 builder.Services.AddSingleton((provider) =>
 {
     string? endpoint = null;
-    string primaryKey = null;
+    string? primaryKey = null;
     using (var tcpClient = new TcpClient())
     {
         SecretClientOptions options = new SecretClientOptions();
-        string? endpointSecret = configuration["cosmos_endpoint"];
-        string primarykeySecret = configuration["cosmos_primarykey"];
+        string keyVaultUrl = configuration["KeyVaultUrl"];
+        var secretClient = new SecretClient(new Uri(keyVaultUrl), new DefaultAzureCredential());
 
-        endpoint = endpointSecret;
-        primaryKey = primarykeySecret;
+        endpoint = GetSecretFromKeyVault(secretClient, "cosmos-endpoint");
+        primaryKey = GetSecretFromKeyVault(secretClient, "cosmos-primarykey");
     }
 
 
@@ -49,6 +49,20 @@ builder.Services.AddSingleton((provider) =>
     var cosmosClient = new CosmosClient(endpoint, primaryKey, cosmosClientOptions);
     return cosmosClient;
 });
+
+string? GetSecretFromKeyVault(SecretClient secretClient, string secretName)
+{
+    try
+    {
+        KeyVaultSecret secret = secretClient.GetSecret(secretName);
+        return secret.Value;
+    }
+    catch (Exception ex)
+    {
+        // Handle the exception
+        return string.Empty;
+    }
+}
 
 // Add the Log service to the builder
 
