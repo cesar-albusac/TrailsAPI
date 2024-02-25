@@ -38,7 +38,7 @@ builder.Services.AddSingleton((provider) =>
         SerializerOptions = new CosmosSerializationOptions()
         {
             PropertyNamingPolicy = CosmosPropertyNamingPolicy.CamelCase
-        }
+        },
     };
 
     var loggerFactory = LoggerFactory.Create(builder =>
