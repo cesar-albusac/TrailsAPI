@@ -14,7 +14,7 @@
 
         // Properties
         [JsonProperty("name")]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         [JsonProperty("distance")]
         public double? Distance { get; set; }

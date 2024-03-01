@@ -59,6 +59,7 @@ string? GetSecretFromKeyVault(SecretClient secretClient, string secretName)
     }
     catch (Exception ex)
     {
+        Console.WriteLine(ex.Message);
         // Handle the exception
         return string.Empty;
     }
@@ -66,7 +67,7 @@ string? GetSecretFromKeyVault(SecretClient secretClient, string secretName)
 
 // Add the Log service to the builder
 
-builder.Services.AddSingleton<ITrailRepository, TrailRepository>();
+builder.Services.AddScoped<ITrailRepository, TrailRepository>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
