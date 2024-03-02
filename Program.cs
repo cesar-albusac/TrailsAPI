@@ -18,52 +18,6 @@ builder.Services.AddCors(options =>
     });
 });
 
-builder.Services.AddSingleton((provider) =>
-{
-    string? endpoint = null;
-    string? primaryKey = null;
-    using (var tcpClient = new TcpClient())
-    {
-        SecretClientOptions options = new SecretClientOptions();
-        string keyVaultUrl = configuration["KeyVaultUrl"];
-        var secretClient = new SecretClient(new Uri(keyVaultUrl), new DefaultAzureCredential());
-
-        endpoint = GetSecretFromKeyVault(secretClient, "cosmos-endpoint");
-        primaryKey = GetSecretFromKeyVault(secretClient, "cosmos-primarykey");
-    }
-
-
-    var cosmosClientOptions = new CosmosClientOptions()
-    {
-        SerializerOptions = new CosmosSerializationOptions()
-        {
-            PropertyNamingPolicy = CosmosPropertyNamingPolicy.CamelCase
-        },
-    };
-
-    var loggerFactory = LoggerFactory.Create(builder =>
-    {
-        builder.AddConsole();
-    });
-
-    var cosmosClient = new CosmosClient(endpoint, primaryKey, cosmosClientOptions);
-    return cosmosClient;
-});
-
-string? GetSecretFromKeyVault(SecretClient secretClient, string secretName)
-{
-    try
-    {
-        KeyVaultSecret secret = secretClient.GetSecret(secretName);
-        return secret.Value;
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine(ex.Message);
-        // Handle the exception
-        return string.Empty;
-    }
-}
 
 // Add the Log service to the builder
 

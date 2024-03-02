@@ -1,5 +1,6 @@
 ﻿using Microsoft.Azure.Cosmos;
 using Trails.Models;
+using TrailsAPI.Helpers;
 
 namespace Trails.Data
 {
@@ -10,9 +11,9 @@ namespace Trails.Data
         private readonly Container container;
         private readonly ILogger _logger;
 
-        public TrailRepository(CosmosClient cosmosClient, IConfiguration configuration, ILogger<TrailRepository> logger)
+        public TrailRepository(IConfiguration configuration, ILogger<TrailRepository> logger)
         {
-            this.cosmosClient = cosmosClient;
+            this.cosmosClient = CosmosClientSingleton.GetInstance(configuration);
             this.configuration = configuration;
             var databaseName = configuration["CosmosDBSettings:DatabaseName"];
             var containerName = configuration["CosmosDBSettings:ContainerName"];
